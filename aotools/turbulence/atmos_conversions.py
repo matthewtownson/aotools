@@ -61,7 +61,7 @@ def r0_to_cn2(r0, lamda=500.E-9):
     Calculates integrated Cn2 value from r0
 
     Parameters:
-        r0 (float): r0 in cm
+        r0 (float): r0 in m
         lamda : wavelength
 
     Returns:
@@ -76,7 +76,7 @@ def r0_to_seeing(r0, lamda=500.E-9):
     Calculates the seeing angle from r0
 
     Parameters:
-        r0 (float): Freid's parameter in cm
+        r0 (float): Freid's parameter in m
         lamda : wavelength
 
     Returns:
