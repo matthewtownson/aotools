@@ -79,5 +79,4 @@ def encircled_energy(data,
     if eeDiameter is False:
         return xi, yi
     else:
-        ee50d = float(xi[numpy.argmin(numpy.abs(yi - fraction))])
-        return ee50d
+        return float(xi[numpy.argmin(numpy.abs(yi - fraction))])

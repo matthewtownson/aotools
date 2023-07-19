@@ -21,8 +21,7 @@ def cn2_to_seeing(cn2, lamda=500.E-9):
         seeing angle in arcseconds
     """
     r0 = cn2_to_r0(cn2,lamda)
-    seeing = r0_to_seeing(r0,lamda)
-    return seeing
+    return r0_to_seeing(r0,lamda)
 
 
 def seeing_to_cn2(seeing, lamda=500.E-9):
@@ -37,8 +36,7 @@ def seeing_to_cn2(seeing, lamda=500.E-9):
         integrated Cn2 value in m^2/3
     """
     r0 = seeing_to_r0(seeing,lamda)
-    cn2 = r0_to_cn2(r0,lamda)
-    return cn2
+    return r0_to_cn2(r0,lamda)
 
 
 def cn2_to_r0(cn2, lamda=500.E-9):
@@ -52,8 +50,7 @@ def cn2_to_r0(cn2, lamda=500.E-9):
     Returns:
         r0 in m
     """
-    r0=(0.423*(2*numpy.pi/lamda)**2*cn2)**(-3./5.)
-    return r0
+    return (0.423*(2*numpy.pi/lamda)**2*cn2)**(-3./5.)
 
 
 def r0_to_cn2(r0, lamda=500.E-9):
@@ -67,8 +64,7 @@ def r0_to_cn2(r0, lamda=500.E-9):
     Returns:
         cn2 (float): integrated Cn2 value in m^2/3
     """
-    cn2 = r0**(-5./3.)/(0.423*(2*numpy.pi/lamda)**2)
-    return cn2
+    return r0**(-5./3.)/(0.423*(2*numpy.pi/lamda)**2)
 
 
 def r0_to_seeing(r0, lamda=500.E-9):
@@ -115,8 +111,7 @@ def coherenceTime(cn2, v, lamda=500.E-9, axis=-1):
         coherence time in seconds
     """
     Jv = (cn2*(v**(5./3.))).sum(axis)
-    tau0 = (Jv**(-3./5.))*0.057*lamda**(6./5.)
-    return tau0
+    return (Jv**(-3./5.))*0.057*lamda**(6./5.)
 
 
 def isoplanaticAngle(cn2, h, lamda=500.E-9, axis=-1):
@@ -135,8 +130,7 @@ def isoplanaticAngle(cn2, h, lamda=500.E-9, axis=-1):
         isoplanatic angle in arcseconds
     """
     Jh = (cn2*(h**(5./3.))).sum(axis)
-    iso = 0.057*lamda**(6./5.)*Jh**(-3./5.)*180.*3600./numpy.pi
-    return iso
+    return 0.057*lamda**(6./5.)*Jh**(-3./5.)*180.*3600./numpy.pi
 
 
 def rytov_variance(cn2, h, lamda=500.E-9, axis=-1):
@@ -197,6 +191,4 @@ def slope_variance_from_r0(r0, wavelength, subapDiam):
 
     """
 
-    slope_var = 0.162 * (wavelength ** 2) * r0 ** (-5. / 3) * subapDiam ** (-1. / 3)
-
-    return slope_var
+    return 0.162 * (wavelength ** 2) * r0 ** (-5. / 3) * subapDiam ** (-1. / 3)

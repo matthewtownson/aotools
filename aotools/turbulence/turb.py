@@ -35,6 +35,4 @@ def phase_covariance(r, r0, L0):
 
     C = (((2 * numpy.pi * r) / L0) ** (5. / 6)) * kv(5. / 6, (2 * numpy.pi * r) / L0)
 
-    cov = A * B1 * B2 * C
-
-    return cov
+    return A * B1 * B2 * C

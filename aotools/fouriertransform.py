@@ -15,11 +15,12 @@ def ft(data, delta):
     Returns:
         ndarray: scaled FFT
     """
-    DATA = numpy.fft.fftshift(
-            numpy.fft.fft(
-                    numpy.fft.fftshift(data, axes=(-1))),
-            axes=(-1)) * delta
-    return DATA
+    return (
+        numpy.fft.fftshift(
+            numpy.fft.fft(numpy.fft.fftshift(data, axes=(-1))), axes=(-1)
+        )
+        * delta
+    )
 
 def ift(data, delta_f):
     """
@@ -33,12 +34,13 @@ def ift(data, delta_f):
         ndarray: Scaled data in real space
     """
 
-    DATA = numpy.fft.ifftshift(
-            numpy.fft.ifft(
-                    numpy.fft.ifftshift(data, axes=(-1))),
-            axes=(-1)) * data.shape[-1] * delta_f
-
-    return DATA
+    return (
+        numpy.fft.ifftshift(
+            numpy.fft.ifft(numpy.fft.ifftshift(data, axes=(-1))), axes=(-1)
+        )
+        * data.shape[-1]
+        * delta_f
+    )
 
 
 def ft2(data, delta):
@@ -53,13 +55,13 @@ def ft2(data, delta):
         ndarray: scaled FFT
     """
 
-    DATA = numpy.fft.fftshift(
-            numpy.fft.fft2(
-                    numpy.fft.fftshift(data, axes=(-1,-2))
-                    ), axes=(-1,-2)
-            )*delta**2
-
-    return DATA
+    return (
+        numpy.fft.fftshift(
+            numpy.fft.fft2(numpy.fft.fftshift(data, axes=(-1, -2))),
+            axes=(-1, -2),
+        )
+        * delta**2
+    )
 
 def ift2(data, delta_f):
     """
@@ -73,13 +75,15 @@ def ift2(data, delta_f):
         ndarray: Scaled data in real space
     """
     N = data.shape[-1]
-    DATA = numpy.fft.ifftshift(
+    return (
+        numpy.fft.ifftshift(
             numpy.fft.ifft2(
-                    numpy.fft.ifftshift(data, axes=(-1,-2)
-                    ), axes=(-1,-2))
-            , axes=(-1,-2)) * (N * delta_f)**2
-
-    return DATA
+                numpy.fft.ifftshift(data, axes=(-1, -2)), axes=(-1, -2)
+            ),
+            axes=(-1, -2),
+        )
+        * (N * delta_f) ** 2
+    )
 
 def rft(data, delta):
     """
@@ -92,11 +96,12 @@ def rft(data, delta):
     Returns:
         ndarray: scaled FFT
     """
-    DATA = numpy.fft.fftshift(
-            numpy.fft.rfft(
-                    numpy.fft.fftshift(data, axes=(-1))),
-            axes=(-1)) * delta
-    return DATA
+    return (
+        numpy.fft.fftshift(
+            numpy.fft.rfft(numpy.fft.fftshift(data, axes=(-1))), axes=(-1)
+        )
+        * delta
+    )
 
 def irft(data, delta_f):
     """
@@ -110,12 +115,13 @@ def irft(data, delta_f):
         ndarray: Scaled data in real space
     """
 
-    DATA = numpy.fft.ifftshift(
-            numpy.fft.irfft(
-                    numpy.fft.ifftshift(data, axes=(-1))),
-            axes=(-1)) * data.shape[-1] * delta_f
-
-    return DATA
+    return (
+        numpy.fft.ifftshift(
+            numpy.fft.irfft(numpy.fft.ifftshift(data, axes=(-1))), axes=(-1)
+        )
+        * data.shape[-1]
+        * delta_f
+    )
 
 def rft2(data, delta):
     """
@@ -128,13 +134,13 @@ def rft2(data, delta):
     Returns:
         ndarray: scaled FFT
     """
-    DATA = numpy.fft.fftshift(
-            numpy.fft.rfft2(
-                    numpy.fft.fftshift(data, axes=(-1,-2))
-                    ), axes=(-1,-2)
-            )*delta**2
-
-    return DATA
+    return (
+        numpy.fft.fftshift(
+            numpy.fft.rfft2(numpy.fft.fftshift(data, axes=(-1, -2))),
+            axes=(-1, -2),
+        )
+        * delta**2
+    )
 
 def irft2(data, delta_f):
     """
@@ -148,10 +154,12 @@ def irft2(data, delta_f):
         ndarray: Scaled data in real space
     """
     N = data.shape[-1]
-    DATA = numpy.fft.ifftshift(
+    return (
+        numpy.fft.ifftshift(
             numpy.fft.irfft2(
-                    numpy.fft.ifftshift(data, axes=(-1,-2)), 
-                    axes=(-1,-2)
-                    ),
-            axes=(-1,-2)) * (N * delta_f)**2
-    return DATA
+                numpy.fft.ifftshift(data, axes=(-1, -2)), axes=(-1, -2)
+            ),
+            axes=(-1, -2),
+        )
+        * (N * delta_f) ** 2
+    )
