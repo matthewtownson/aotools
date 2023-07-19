@@ -55,9 +55,7 @@ def get_tps_time_axis(frame_rate, n_frames):
         ndarray: Time values for temporal power spectra plots
     """
 
-    t_vals = numpy.fft.fftfreq(n_frames, 1./frame_rate)[:int(n_frames/2)]
-
-    return t_vals
+    return numpy.fft.fftfreq(n_frames, 1./frame_rate)[:int(n_frames/2)]
 
 
 def plot_tps(slope_data, frame_rate):
@@ -83,7 +81,7 @@ def plot_tps(slope_data, frame_rate):
 
     # plot each power spectrum
     for i_ps, ps in enumerate(tps):
-        ax.loglog(t_axis_data, ps, label="Spectrum {}".format(i_ps))
+        ax.loglog(t_axis_data, ps, label=f"Spectrum {i_ps}")
 
     ax.legend()
 

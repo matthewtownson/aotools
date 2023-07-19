@@ -167,13 +167,4 @@ class TestCircle(unittest.TestCase):
 
 
         log.info("Raise TypeError if inputs not of correct type")
-
-        # For testing by hand and observing the result:
-        if False:
-            import pylab; pylab.ion()
-
-            c = pupil.circle(2, 5, (0.5, 0.5))
-            pylab.imshow(c, interpolation="nearest")
-
-            c1 = pupil.circle(1, 5)
             #pylab.imshow(c-c1, interpolation="nearest")

@@ -57,12 +57,11 @@ def zernike_nm(n, m, N, rot=0):
 
     if m==0:
         Z = numpy.sqrt(n+1)*zernikeRadialFunc(n, 0, R)
-    else:
-        if m > 0: # j is even
-            Z = numpy.sqrt(2*(n+1)) * zernikeRadialFunc(n, m, R) * numpy.cos((m*theta)+rot)
-        else:   #i is odd
-            m = abs(m)
-            Z = numpy.sqrt(2*(n+1)) * zernikeRadialFunc(n, m, R) * numpy.sin((m*theta)+rot)
+    elif m > 0: # j is even
+        Z = numpy.sqrt(2*(n+1)) * zernikeRadialFunc(n, m, R) * numpy.cos((m*theta)+rot)
+    else:   #i is odd
+        m = abs(m)
+        Z = numpy.sqrt(2*(n+1)) * zernikeRadialFunc(n, m, R) * numpy.sin((m*theta)+rot)
 
     # clip
     Z = Z*numpy.less_equal(R, 1.0)
@@ -113,10 +112,7 @@ def zernIndex(j):
     m = int((p+k)/2.)*2 - k
 
     if m!=0:
-        if j%2==0:
-            s=1
-        else:
-            s=-1
+        s = 1 if j%2==0 else -1
         m *= s
 
     return [n, m]
@@ -187,25 +183,19 @@ def makegammas(nzrad):
 
     for p in range(1,nzrad+1):
         for q in range(p+1):
-            if(numpy.fmod(p-q,2)==0):
-                if(q>0):
-                    n.append(p)
-                    m.append(q)
-                    trig=not(trig)
+            if (numpy.fmod(p-q,2)==0):
+                n.append(p)
+                m.append(q)
+                trig=not(trig)
+                if (q>0):
                     tt.append(trig)
                     n.append(p)
                     m.append(q)
                     trig=not(trig)
                     tt.append(trig)
                 else:
-                    n.append(p)
-                    m.append(q)
                     tt.append(1)
-                    trig=not(trig)
     nzmax=len(n)
-
-    #for j in range(nzmax):
-        #print j+1, n[j], m[j], tt[j]
 
     gamx = numpy.zeros((nzmax,nzmax),"float32")
     gamy = numpy.zeros((nzmax,nzmax),"float32")
@@ -227,15 +217,14 @@ def makegammas(nzrad):
             elif m[j]==0:
                 if ((i+1) % 2) == 1:
                     gamx[i,j] = 0.0
-            else:
-                if ( ((i+1) % 2) != ((j+1) % 2) ):
-                    gamx[i,j] = 0.0
+            elif ( ((i+1) % 2) != ((j+1) % 2) ):
+                gamx[i,j] = 0.0
 
             # Rule c:
             if abs(m[j]-m[i]) != 1:
                 gamx[i,j] = 0.0
 
-            # Rule d - all elements positive therefore already true
+                    # Rule d - all elements positive therefore already true
 
     # Gamma y
     for i in range(nzmax):
@@ -254,9 +243,8 @@ def makegammas(nzrad):
             elif m[j]==0:
                 if ((i+1) % 2) == 0:
                     gamy[i,j] = 0.0
-            else:
-                if ( ((i+1) % 2) == ((j+1) % 2) ):
-                    gamy[i,j] = 0.0
+            elif ( ((i+1) % 2) == ((j+1) % 2) ):
+                gamy[i,j] = 0.0
 
             # Rule c:
             if abs(m[j]-m[i]) != 1:
@@ -273,7 +261,4 @@ def makegammas(nzrad):
             elif m[j]==(m[i]-1):
                 if ((i+1) % 2) == 0:
                     gamy[i,j] *= -1.    # line 3
-            else:
-                pass    # line 4
-
     return numpy.array([gamx,gamy])

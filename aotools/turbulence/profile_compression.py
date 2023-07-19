@@ -56,10 +56,7 @@ def equivalent_layers(h, p, L, w=None):
         if w is not None:
             w_el[i] = ((p[ix_tmp] * w[ix_tmp]**(5/3)).sum() / p[ix_tmp].sum())**(3/5)
 
-    if w is not None:
-        return h_el, cn2_el, w_el
-
-    return h_el, cn2_el
+    return (h_el, cn2_el, w_el) if w is not None else (h_el, cn2_el)
 
 def optimal_grouping(R, L, h, p):
     '''
@@ -82,17 +79,14 @@ def optimal_grouping(R, L, h, p):
     # set initial best grouping to be (approx) equal splits 
     gamma_best = numpy.linspace(0,N,L+1,dtype=int)[1:-1]
     gamma_best, G_best = _optGroupingMinimization(gamma_best, h, p)
-    for r in range(R):
+    for _ in range(R):
         gamma_new, G_new = _optGroupingMinimization(_random_grouping(N,L), h, p)
         if G_new < G_best:
             gamma_best = gamma_new
             G_best = G_new
 
-    cn2 = []
     hmin_best = _G(_convert_splits_to_groups(gamma_best, N), h, p, return_hmin=True)[1]
-    for groups in _convert_splits_to_groups(gamma_best,N):
-        cn2.append(p[groups].sum())
-
+    cn2 = [p[groups].sum() for groups in _convert_splits_to_groups(gamma_best,N)]
     return numpy.array(hmin_best), numpy.array(cn2)
 
 def GCTM(h, p, L, h_scaling=10000., cn2_scaling=100e-15):
@@ -113,10 +107,10 @@ def GCTM(h, p, L, h_scaling=10000., cn2_scaling=100e-15):
         cn2_L (numpy.ndarray): compressed profile cn2 
     '''
     mom0 = _moments(h/h_scaling, p/cn2_scaling, L)
-    bounds = [(0,None) for i in range(2*L)]
-    
+    bounds = [(0,None) for _ in range(2*L)]
+
     # calculate first guess using equivalent layers
-    guess_h, guess_cn2 = equivalent_layers(h,p,L) 
+    guess_h, guess_cn2 = equivalent_layers(h,p,L)
     x0 = numpy.hstack([guess_h/h_scaling, guess_cn2/cn2_scaling]) # scale so that we don't have overflow issues
     res = minimize(_moments_minfunc, x0, args=(L, mom0), bounds = bounds)['x']
     return res[:L]*h_scaling, res[L:] * cn2_scaling
@@ -126,8 +120,7 @@ def _random_grouping(N, L):
     Creates a random grouping of N elements into L groups
     '''
     options = numpy.arange(0,N-2)
-    splits = numpy.sort(numpy.random.choice(options, size=L-1, replace=False))
-    return splits 
+    return numpy.sort(numpy.random.choice(options, size=L-1, replace=False)) 
 
 def _vicinity(grouping, N):
     '''
@@ -144,12 +137,12 @@ def _vicinity(grouping, N):
             grouping_tmp = grouping.copy()
             grouping_tmp = numpy.insert(grouping_tmp,i,j)
             pre_merge.append(grouping_tmp)
-    
+
     # of these groupings, merge every two neighbouring groupings in each
     merged = []
-    for i in range(len(pre_merge)):
-        for j in range(len(pre_merge[i])):
-            merge_tmp = pre_merge[i].copy()
+    for item in pre_merge:
+        for j in range(len(item)):
+            merge_tmp = item.copy()
             merged.append(numpy.delete(merge_tmp,j))
 
     return merged 
@@ -180,9 +173,7 @@ def _G(grouping, h, p, return_hmin=False):
         cost_function_value += cost_function.min()
         if return_hmin:
             hmin.append(h[group[numpy.argmin(cost_function)]])
-    if return_hmin:
-        return cost_function_value, hmin
-    return cost_function_value
+    return (cost_function_value, hmin) if return_hmin else cost_function_value
 
 @njit
 def _Gjit(splits, h, p):
@@ -217,7 +208,7 @@ def _optGroupingMinimization(start_grouping,h,p,maxiter=200):
     '''
     gamma_new = start_grouping
     N = len(p)
-    for i in range(maxiter):
+    for _ in range(maxiter):
         gamma_old = gamma_new
         V = numpy.array(_vicinity(gamma_old, N))
         Gvals = numpy.zeros(len(V))

@@ -64,11 +64,18 @@ def stf_vonKarman(r, L0):
         L0 is in unit of telescope diameter, typically a few (3; or 20m)
     '''
     r0 = 1
-    D_vk = (0.17253 * (L0 / (r0)) ** (5. / 3.)
-            * (1 - 2 * np.pi ** (5. / 6.) * ((r) / L0) ** (5. / 6.)
-               / scipy.special.gamma(5. / 6.)
-               * scipy.special.kv(5. / 6., (2 * np.pi * r) / L0)))
-    return D_vk
+    return (
+        0.17253
+        * (L0 / (r0)) ** (5.0 / 3.0)
+        * (
+            1
+            - 2
+            * np.pi ** (5.0 / 6.0)
+            * ((r) / L0) ** (5.0 / 6.0)
+            / scipy.special.gamma(5.0 / 6.0)
+            * scipy.special.kv(5.0 / 6.0, (2 * np.pi * r) / L0)
+        )
+    )
 
 
 def gkl_radii(ri, nr):
@@ -138,10 +145,9 @@ def gkl_kernel(ri, nr, rad, stfunc='kolmogorov', outerscale=None):
             radius = 0.5 * np.sqrt(rad[i]**2 + rad[j]**2 -
                                    2 * rad[i] * rad[j] *
                                    np.cos(np.arange(nth) * 2 * np.pi / nth))
-            if (stfunc == 'kolmogorov') or (stfunc == 'kolstf'):
+            if stfunc in ['kolmogorov', 'kolstf']:
                 sf = stf_kolmogorov(radius)
-            elif (stfunc == 'vonKarman') or (stfunc == 'karman') or \
-                    (stfunc == 'vk'):
+            elif stfunc in ['vonKarman', 'karman', 'vk']:
                 assert outerscale is not None
                 sf = stf_vonKarman(radius, outerscale)
             else:
@@ -261,7 +267,7 @@ def gkl_fcom(ri, kernels, nfunc, verbose=False):
     # highest eigenvalues *
     kers = kers[:, :, 0:nus]
     evs = np.reshape(evs[:, 0:nus].T, nr * nus)
-    a = (np.argsort(-1 * evs))[0:nfunc]
+    a = (np.argsort(-1 * evs))[:nfunc]
 
     # every eigenvalue occurs twice except those for the zeroth order mode.
     # this could be done without the loops,
@@ -282,7 +288,7 @@ def gkl_fcom(ri, kernels, nfunc, verbose=False):
         if (no >= nfunc):
             break
 
-    oind = oind[0:nfunc]
+    oind = oind[:nfunc]
     tord = oind // nr
     odd = ((np.arange(nfunc) % 2) == 1)
     pio = oind % nr
@@ -370,11 +376,20 @@ def gkl_basis(ri=0.25, nr=40, npp=None, nfunc=500,
 
     azi_basis = gkl_azimuthal(nord, npp)
 
-    gklbasis = {'nr': nr, 'np': npp, 'nfunc': nfunc, 'ri': ri, 'stfn': ' ',
-                'radp': rad_basis, 'evals': evals,
-                'nord': nord, 'npo': npo, 'ord': oord,
-                'rabas': rabas, 'azbas': azi_basis}
-    return gklbasis
+    return {
+        'nr': nr,
+        'np': npp,
+        'nfunc': nfunc,
+        'ri': ri,
+        'stfn': ' ',
+        'radp': rad_basis,
+        'evals': evals,
+        'nord': nord,
+        'npo': npo,
+        'ord': oord,
+        'rabas': rabas,
+        'azbas': azi_basis,
+    }
 
 
 def gkl_sfi(kl_basis, i):
@@ -392,9 +407,7 @@ def gkl_sfi(kl_basis, i):
     rad_bas = rebin(np.reshape(kl_basis['rabas'][:, i], (nr, 1)), (nr, npp))
     az_bas = rebin(np.reshape(kl_basis['azbas'][oord, :], (1, npp)), (nr, npp))
 
-    sf = rad_bas * az_bas
-
-    return sf
+    return rad_bas * az_bas
 
 
 def radii(nr, npp, ri):
@@ -417,9 +430,7 @@ def radii(nr, npp, ri):
     # r2 = ri**2 + (np.arange(nr) + 0.5) / nr * (1 - ri**2)
     r2 = ri**2 + (np.arange(nr)) / nr * (1 - ri**2)
     rs = np.sqrt(r2)
-    ra = rebin(np.reshape(rs, (nr, 1)), (nr, npp))
-    # ra = rebin(rs, nr, npp)
-    return ra
+    return rebin(np.reshape(rs, (nr, 1)), (nr, npp))
 
 
 def polang(r):
@@ -433,8 +444,7 @@ def polang(r):
     # phi = np.zeros((nr, npp))
     phi1 = np.arange(npp) / npp * 2.0 * np.pi
 
-    phi = np.transpose(rebin(np.reshape(phi1, (npp, 1)), (npp, nr)))
-    return phi
+    return np.transpose(rebin(np.reshape(phi1, (npp, 1)), (npp, nr)))
 
 
 def set_pctr(bas, ncp=None, ncmar=None):
@@ -542,11 +552,18 @@ def pcgeom(nr, npp, ncp, ri, ncmar):
     cr = np.clip(cr, 1e-3, nr - 1.001)  # - 1.00)
     cp = np.clip(cp, 1e-3, npp - 1.001)  # - 1.00)
 
-    geom = {'px': px, 'py': py, 'cr': cr, 'cp': cp,
-            'pincx': pincx, 'pincy': pincy, 'pincw': pincw,
-            'ap': ap, 'ncp': ncp, 'ncmar': ncmar}
-
-    return geom
+    return {
+        'px': px,
+        'py': py,
+        'cr': cr,
+        'cp': cp,
+        'pincx': pincx,
+        'pincy': pincy,
+        'pincw': pincw,
+        'ap': ap,
+        'ncp': ncp,
+        'ncmar': ncmar,
+    }
 
 
 def pol2car(cpgeom, pol, mask=False):
@@ -621,8 +638,7 @@ def make_kl(nmax, dim, ri=0.0, nr=40,
         print('Polar grid sampling may be insufficienttoto_basis2.fits, please'
               ' consider increasing nr')
 
-    assert (stf == 'kolmogorov') or (stf == 'kolstf') or (stf == 'vonKarman') \
-        or (stf == 'karman') or (stf == 'vk')
+    assert stf in ['kolmogorov', 'kolstf', 'vonKarman', 'karman', 'vk']
 
     if stf == 'vonKarman':
         assert outerscale is not None

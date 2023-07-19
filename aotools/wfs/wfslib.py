@@ -41,10 +41,7 @@ def findActiveSubaps(subaps, mask, threshold, returnFill=False):
 
     subapCoords = numpy.array( subapCoords )
 
-    if returnFill:
-        return subapCoords, numpy.array(fills)
-    else:
-        return subapCoords
+    return (subapCoords, numpy.array(fills)) if returnFill else subapCoords
 
 
 def computeFillFactor(mask, subapPos, subapSpacing):

@@ -85,7 +85,7 @@ def test_tps_fit():
 
 
     if plot:
-        print("V: {}, f_noise: {}, A: {}".format(V, f_noise, A))
+        print(f"V: {V}, f_noise: {f_noise}, A: {A}")
         pyplot.cla()
         ax = pyplot.gca()
         ax.set_xscale('log')
@@ -99,7 +99,7 @@ def test_tps_fit():
         ax.plot([f0]*2, [0.1, tps.max()], color='k')
         pyplot.draw()
         pyplot.pause(0.01)
-        print("Error Func: {}".format(err))
+        print(f"Error Func: {err}")
 
     return err
 

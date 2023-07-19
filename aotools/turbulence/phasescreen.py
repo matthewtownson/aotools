@@ -85,9 +85,7 @@ def ft_sh_phase_screen(r0, N, delta, L0, l0, FFT=None, seed=None):
 
     phs_lo = phs_lo.real - phs_lo.real.mean()
 
-    phs = phs_lo+phs_hi
-
-    return phs
+    return phs_lo+phs_hi
 
 
 def ft_phase_screen(r0, N, delta, L0, l0, FFT=None, seed=None):
@@ -136,9 +134,7 @@ def ft_phase_screen(r0, N, delta, L0, l0, FFT=None, seed=None):
 
     cn = ((R.normal(size=(N, N))+1j * R.normal(size=(N, N))) * numpy.sqrt(PSD_phi)*del_f)
 
-    phs = ift2(cn, 1, FFT).real
-
-    return phs
+    return ift2(cn, 1, FFT).real
 
 
 def ift2(G, delta_f, FFT=None):
@@ -153,9 +149,8 @@ def ift2(G, delta_f, FFT=None):
 
     N = G.shape[0]
 
-    if FFT:
-        g = numpy.fft.fftshift(FFT(numpy.fft.fftshift(G))) * (N * delta_f) ** 2
-    else:
-        g = fft.ifftshift(fft.ifft2(fft.fftshift(G))) * (N * delta_f) ** 2
-
-    return g
+    return (
+        numpy.fft.fftshift(FFT(numpy.fft.fftshift(G))) * (N * delta_f) ** 2
+        if FFT
+        else fft.ifftshift(fft.ifft2(fft.fftshift(G))) * (N * delta_f) ** 2
+    )

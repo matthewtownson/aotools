@@ -55,10 +55,10 @@ def angularSpectrum(inputComplexAmp, wvl, inputSpacing, outputSpacing, z):
 
     Q3 = numpy.exp(1j * k/2. * (mag-1)/(mag*z) * r2sq)
 
-    #Compute propagated field
-    outputComplexAmp = Q3 * fouriertransform.ift2(
-                    Q2 * fouriertransform.ft2(Q1 * inputComplexAmp/mag,inputSpacing), df1)
-    return outputComplexAmp
+    return Q3 * fouriertransform.ift2(
+        Q2 * fouriertransform.ft2(Q1 * inputComplexAmp / mag, inputSpacing),
+        df1,
+    )
 
 
 def oneStepFresnel(Uin, wvl, d1, z):
@@ -90,9 +90,7 @@ def oneStepFresnel(Uin, wvl, d1, z):
     B = numpy.exp( 1j * k/(2*z) * (x2**2 + y2**2))
     C = fouriertransform.ft2(Uin *numpy.exp(1j * k/(2*z) * (x1**2+y1**2)), d1)
 
-    Uout = A*B*C
-
-    return Uout
+    return A*B*C
 
 def twoStepFresnel(Uin, wvl, d1, d2, z):
     """
@@ -144,9 +142,7 @@ def twoStepFresnel(Uin, wvl, d1, d2, z):
     A = 1. / (1j * wvl * Dz2)
     B = numpy.exp( 1j * k/(2 * Dz2) * (x2**2 + y2**2) )
     C = fouriertransform.ft2(Uitm * numpy.exp( 1j * k/(2*Dz2) * (x1a**2 + y1a**2)), d1a)
-    Uout = A*B*C
-
-    return Uout
+    return A*B*C
 
 def lensAgainst(Uin, wvl, d1, f):
     '''
@@ -174,8 +170,8 @@ def lensAgainst(Uin, wvl, d1, f):
     x2,y2 = numpy.meshgrid(wvl * f * fX, wvl * f * fX)
     del(fX)
 
-    #Evaluate the Fresnel-Kirchoff integral but with the quadratic
-    #phase factor inside cancelled by the phase of the lens
-    Uout = numpy.exp( 1j*k/(2*f) * (x2**2 + y2**2) )/ (1j*wvl*f) * fouriertransform.ft2( Uin, d1)
-
-    return Uout
+    return (
+        numpy.exp(1j * k / (2 * f) * (x2**2 + y2**2))
+        / (1j * wvl * f)
+        * fouriertransform.ft2(Uin, d1)
+    )

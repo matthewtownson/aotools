@@ -33,7 +33,7 @@ if __name__ == "__main__":
     pyplot.figure()
     pyplot.imshow(screen.scrn)
     pyplot.colorbar()
-    for i in range(100):
+    for _ in range(100):
         screen.add_row()
 
         pyplot.clf()

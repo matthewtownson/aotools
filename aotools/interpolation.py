@@ -33,7 +33,7 @@ def zoom(array, newSize, order=3):
     coordsY = numpy.linspace(0, array.shape[1]-1, ySize)
 
     #If array is complex must do 2 interpolations
-    if array.dtype==numpy.complex64 or array.dtype==numpy.complex128:
+    if array.dtype in [numpy.complex64, numpy.complex128]:
 
         realInterpObj = interp2d(   numpy.arange(array.shape[0]),
                 numpy.arange(array.shape[1]), array.real, copy=False, 
@@ -44,7 +44,7 @@ def zoom(array, newSize, order=3):
         return (realInterpObj(coordsY,coordsX) 
                             + 1j*imagInterpObj(coordsY,coordsX))
 
-        
+
 
     else:
 
@@ -80,17 +80,17 @@ def zoom_rbs(array, newSize, order=3):
     coordsY = numpy.linspace(0, array.shape[1]-1, ySize)
 
     #If array is complex must do 2 interpolations
-    if array.dtype==numpy.complex64 or array.dtype==numpy.complex128:
+    if array.dtype in [numpy.complex64, numpy.complex128]:
         realInterpObj = RectBivariateSpline(   
                 numpy.arange(array.shape[0]), numpy.arange(array.shape[1]), 
                 array.real, kx=order, ky=order)
         imagInterpObj = RectBivariateSpline(   
                 numpy.arange(array.shape[0]), numpy.arange(array.shape[1]), 
                 array.imag, kx=order, ky=order)
-                         
+
         return (realInterpObj(coordsY,coordsX)
                             + 1j*imagInterpObj(coordsY,coordsX))
-            
+
     else:
 
         interpObj = RectBivariateSpline(   numpy.arange(array.shape[0]),
@@ -107,7 +107,7 @@ def binImgs(data, n):
     otherwise......
     '''
     shape = numpy.array( data.shape )
-    
+
     n = int(numpy.round(n))
 
     if len(data.shape)==2:
@@ -120,7 +120,6 @@ def binImgs(data, n):
         for i in range(n):
             binnedImg += binnedImgTmp[i::n,:]
 
-        return binnedImg
     else:
         shape[-1]/=n
         binnedImgTmp = numpy.zeros ( shape, dtype=data.dtype )
@@ -132,4 +131,4 @@ def binImgs(data, n):
         for i in range(n):
             binnedImg += binnedImgTmp[...,i::n,:]
 
-        return binnedImg
+    return binnedImg

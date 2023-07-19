@@ -99,8 +99,8 @@ class CovarianceMatrix(object):
         # Create a list with n_layers elements, each of which is a list of the WFS meta-subap positions at that altitude
         self.subap_layer_positions = []
         self.subap_layer_diameters = []
-        for layer_n, layer_altitude in enumerate(self.layer_altitudes):
-            subap_n = 0
+        subap_n = 0
+        for layer_altitude in self.layer_altitudes:
             wfs_pos = []
             wfs_subap_diameters = []
             for wfs_n in range(self.n_wfs):
@@ -201,13 +201,19 @@ class CovarianceMatrix(object):
             args = []
             for wfs_i in range(self.n_wfs):
                 # Only loop over upper diagonal of covariance matrix as its symmetrical
-                for wfs_j in range(wfs_i+1):
-                    args.append((
-                            self.n_subaps[wfs_i], self.n_subaps[wfs_j],
-                            self.subap_layer_positions[layer_n][wfs_i], self.subap_layer_positions[layer_n][wfs_j],
-                            self.subap_layer_diameters[layer_n][wfs_i], self.subap_layer_diameters[layer_n][wfs_j],
-                            self.layer_r0s[layer_n], self.layer_L0s[layer_n]))
-
+                args.extend(
+                    (
+                        self.n_subaps[wfs_i],
+                        self.n_subaps[wfs_j],
+                        self.subap_layer_positions[layer_n][wfs_i],
+                        self.subap_layer_positions[layer_n][wfs_j],
+                        self.subap_layer_diameters[layer_n][wfs_i],
+                        self.subap_layer_diameters[layer_n][wfs_j],
+                        self.layer_r0s[layer_n],
+                        self.layer_L0s[layer_n],
+                    )
+                    for wfs_j in range(wfs_i + 1)
+                )
             self.cov_mats = pool.map(wfs_covariance_mpwrap, args)
 
             thread_n = 0
@@ -339,13 +345,11 @@ def compute_covariance_xx(seperation, subap1_diam, subap2_diam, r0, L0):
     x3 = seperation[..., 0] + (subap2_diam + subap1_diam) * 0.5
     r3 = numpy.sqrt(x3**2 + seperation[..., 1]**2)
 
-    Cxx = (-2 * structure_function_vk(r1, r0, L0)
-            + structure_function_vk(r2, r0, L0)
-            + structure_function_vk(r3, r0, L0)
-           )
-
-
-    return Cxx
+    return (
+        -2 * structure_function_vk(r1, r0, L0)
+        + structure_function_vk(r2, r0, L0)
+        + structure_function_vk(r3, r0, L0)
+    )
 
 def compute_covariance_yy(seperation, subap1_diam, subap2_diam, r0, L0):
 
@@ -358,12 +362,11 @@ def compute_covariance_yy(seperation, subap1_diam, subap2_diam, r0, L0):
     y3 = seperation[..., 1] + (subap2_diam + subap1_diam) * 0.5
     r3 = numpy.sqrt(seperation[..., 0]**2 + y3**2)
 
-    Cyy = (-2 * structure_function_vk(r1, r0, L0)
-           + structure_function_vk(r2, r0, L0)
-           + structure_function_vk(r3, r0, L0)
-           )
-
-    return Cyy
+    return (
+        -2 * structure_function_vk(r1, r0, L0)
+        + structure_function_vk(r2, r0, L0)
+        + structure_function_vk(r3, r0, L0)
+    )
 
 
 def compute_covariance_xy(seperation, subap1_diam, subap2_diam, r0, L0):
@@ -384,15 +387,12 @@ def compute_covariance_xy(seperation, subap1_diam, subap2_diam, r0, L0):
     y4 = seperation[..., 1] - subap2_diam * 0.5
     r4 = numpy.sqrt(x4**2 + y4**2)
 
-    # print("\n",r1, r2, r3, r4)
-
-    Cxy = (- structure_function_vk(r1, r0, L0)
-            - structure_function_vk(r2, r0, L0)
-            + structure_function_vk(r3, r0, L0)
-            + structure_function_vk(r4, r0, L0)
-           )
-
-    return Cxy
+    return (
+        -structure_function_vk(r1, r0, L0)
+        - structure_function_vk(r2, r0, L0)
+        + structure_function_vk(r3, r0, L0)
+        + structure_function_vk(r4, r0, L0)
+    )
 
 def structure_function_vk(seperation, r0, L0):
     """
@@ -406,14 +406,18 @@ def structure_function_vk(seperation, r0, L0):
     Returns:
         ndarray, float: Structure function for seperation(s)
     """
-    ## theoretical structure function
-    D_vk = (    0.17253 * (L0 / (r0)) ** (5. / 3.)
-                * (1 - 2 * numpy.pi ** (5. / 6.) * ((seperation) / L0) ** (5. / 6.)
-                / scipy.special.gamma(5. / 6.)
-                * scipy.special.kv(5. / 6., (2 * numpy.pi * seperation) / L0))
-            )
-
-    return D_vk
+    return (
+        0.17253
+        * (L0 / (r0)) ** (5.0 / 3.0)
+        * (
+            1
+            - 2
+            * numpy.pi ** (5.0 / 6.0)
+            * ((seperation) / L0) ** (5.0 / 6.0)
+            / scipy.special.gamma(5.0 / 6.0)
+            * scipy.special.kv(5.0 / 6.0, (2 * numpy.pi * seperation) / L0)
+        )
+    )
 
 
 def structure_function_kolmogorov(separation, r0):
@@ -499,6 +503,4 @@ def create_tomographic_covariance_reconstructor(covariance_matrix, n_onaxis_suba
 
     icov_offoff = numpy.linalg.pinv(cov_offoff, rcond=svd_conditioning)
 
-    tomo_recon = cov_onoff.dot(icov_offoff)
-
-    return tomo_recon
+    return cov_onoff.dot(icov_offoff)
