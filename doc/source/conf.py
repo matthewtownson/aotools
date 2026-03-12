@@ -401,6 +401,7 @@ epub_exclude_files = ['search.html']
 
 # Example configuration for intersphinx: refer to the Python standard library.
 # Sphinx 9 expects a mapping of key -> (target, inventory).
+# The inventory location (second element) must be a string or None.
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', {})
+    'python': ('https://docs.python.org/3', None),
 }
