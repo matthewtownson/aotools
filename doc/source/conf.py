@@ -109,7 +109,7 @@ release = aotools.__version__  # '0.1.0'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -400,4 +400,7 @@ epub_exclude_files = ['search.html']
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+# Sphinx 9 expects a mapping of key -> (target, inventory).
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', {})
+}
