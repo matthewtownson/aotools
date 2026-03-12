@@ -23,6 +23,13 @@ sys.path.append(AOTOOLS_DIR)
 class Mock(MagicMock):
     @classmethod
     def __getattr__(cls, name):
+        # Make mocked modules behave more like real ones for importlib.
+        # In particular, importlib expects __path__ to be iterable when
+        # resolving submodules (e.g. scipy.linalg).
+        if name == '__path__':
+            return []
+        if name == '__file__':
+            return ''
         return Mock()
 
 
