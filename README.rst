@@ -34,7 +34,7 @@ Installation
 ------------
 
 As everything is just pure python, you don't really need to "install" at all. To be able to use the tools from anywhere on your system,
-add the ``aotools`` directory to your ``PYTHONTPATH``.
+add the ``aotools`` directory to your ``PYTHONPATH``.
 Alternatively you can use one of the methods below.
 
 Anaconda
@@ -63,7 +63,7 @@ Alternatively, to install the tools to your system python distribution from sour
 
 .. code-block:: python
 
-    python setup.py install
+    pip install .
 
 (which may require admin or root privileges) from the ``aotools`` directory.
 
