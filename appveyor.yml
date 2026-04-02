@@ -6,6 +6,8 @@ environment:
       MINICONDA: C:\Miniconda310-x64
     - PYTHON_VERSION: "3.11"
       MINICONDA: C:\Miniconda311-x64
+    - PYTHON_VERSION: "3.12"
+      MINICONDA: C:\Miniconda312-x64
 
 branches:
   only:
